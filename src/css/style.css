@@ -1,4 +1,13 @@
-body {
+body,html {
     background-color: #444;
-    background-image: url("../image/astronomydark.jpg")
+    background-image: url("../image/astronomy.jpg");
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+#spaceship {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
