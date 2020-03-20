@@ -1,7 +1,11 @@
 import './spaceship.js'
 const template = document.createElement('template')
 template.innerHTML = `
-<div id="container"></div>
+<div id="container">
+<template>
+<img id="bomb" src="../image/bomb.png" alt="bomb"></img>
+</template>
+</div>
 `
 
 export class BattleGame extends window.HTMLElement {
@@ -26,13 +30,12 @@ export class BattleGame extends window.HTMLElement {
 
     const spaceship = document.createElement('space-ship')
     spaceship.style.position = 'absolute'
-    spaceship.style.top = 0
-    spaceship.style.left = 0
+    spaceship.style.top = 32
+    spaceship.style.left = 32
     container.appendChild(spaceship)
 
-    let top = 0
-    let left = 0
-
+    let top = 32
+    let left = 32
     document.addEventListener('keydown', () => {
       switch (event.keyCode) {
         case 39:
@@ -61,6 +64,42 @@ export class BattleGame extends window.HTMLElement {
           break
       }
     })
+    this.shoot()
+  }
+
+  shoot () {
+    document.addEventListener('keydown', event => {
+      if (event.keyCode === 32) {
+        this.createBomb()
+      }
+    })
+  }
+
+  createBomb () {
+    const container = this.shadowRoot.querySelector('#container')
+    const spaceship = this.shadowRoot.querySelector('space-ship')
+    const top = parseInt(spaceship.style.top)
+    let bomb = this.shadowRoot.querySelector('template').content.firstElementChild
+    bomb = document.importNode(bomb, true)
+    bomb.style.position = 'absolute'
+    bomb.style.top = (top - 32) + 'px'
+    bomb.style.left = parseInt(spaceship.style.left) + 15 + 'px'
+    this.moveBomb(bomb, top - 32)
+    container.appendChild(bomb)
+  }
+
+  moveBomb (bomb, top) {
+    console.log(bomb)
+    if (top > 0) {
+      console.log('executing')
+      setTimeout(timeout => {
+        bomb.style.top = top + 'px'
+        top = top - 16
+        this.moveBomb(bomb, top)
+      }, 1000)
+    } else {
+      bomb.src = '../image/boom.png'
+    }
   }
 
   validatePostionLeft (left, code) {
