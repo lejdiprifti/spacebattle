@@ -1,4 +1,5 @@
 import './spaceship.js'
+import './alien.js'
 const template = document.createElement('template')
 template.innerHTML = `
 <div id="container">
@@ -15,6 +16,7 @@ export class BattleGame extends window.HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true))
     this.createArray()
     this.moveSpaceship()
+    this.createAliens()
   }
 
   createArray () {
@@ -89,9 +91,7 @@ export class BattleGame extends window.HTMLElement {
   }
 
   moveBomb (bomb, top) {
-    console.log(bomb)
     if (top > 0) {
-      console.log('executing')
       setTimeout(timeout => {
         bomb.style.top = top + 'px'
         top = top - 16
@@ -99,6 +99,29 @@ export class BattleGame extends window.HTMLElement {
       }, 1000)
     } else {
       bomb.src = '../image/boom.png'
+    }
+  }
+
+  createAliens () {
+    const alien = document.createElement('evil-alien')
+    const container = this.shadowRoot.querySelector('#container')
+    setTimeout(timeout => {
+      alien.style.position = 'absolute'
+      alien.style.top = 0 + 'px'
+      alien.style.left = parseInt(Math.random() * 1000) + 'px'
+      container.appendChild(alien)
+      this.moveAliens(alien)
+      this.createAliens()
+    }, 500)
+  }
+
+  moveAliens (alien) {
+    const top = parseInt(alien.style.top)
+    if (top < 544) {
+      setTimeout(timeout => {
+        alien.style.top = top + 16 + 'px'
+        this.moveAliens(alien)
+      }, 1000)
     }
   }
 
