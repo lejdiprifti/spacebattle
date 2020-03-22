@@ -2,6 +2,9 @@ import './spaceship.js'
 import './alien.js'
 const template = document.createElement('template')
 template.innerHTML = `
+<head>
+<link rel="stylesheet" href="../css/style.css" />
+</head>
 <div id="container">
 <template>
 <img id="bomb" src="../image/bomb.png" alt="bomb"></img>
@@ -42,26 +45,26 @@ export class BattleGame extends window.HTMLElement {
       switch (event.keyCode) {
         case 39:
           if (this.validatePostionLeft(left, event.keyCode) === true) {
-            spaceship.style.left = (left + 32) + 'px'
-            left += 32
+            spaceship.style.left = (left + 16) + 'px'
+            left += 16
           }
           break
         case 37:
           if (this.validatePostionLeft(left, event.keyCode) === true) {
-            spaceship.style.left = (left - 32) + 'px'
-            left -= 32
+            spaceship.style.left = (left - 16) + 'px'
+            left -= 16
           }
           break
         case 38:
           if (this.validatePostionTop(top, event.keyCode) === true) {
-            spaceship.style.top = (top - 32) + 'px'
-            top -= 32
+            spaceship.style.top = (top - 16) + 'px'
+            top -= 16
           }
           break
         case 40:
           if (this.validatePostionTop(top, event.keyCode) === true) {
-            spaceship.style.top = (top + 32) + 'px'
-            top += 32
+            spaceship.style.top = (top + 16) + 'px'
+            top += 16
           }
           break
       }
@@ -92,19 +95,19 @@ export class BattleGame extends window.HTMLElement {
 
   moveBomb (bomb, top) {
     if (top > 0) {
-      setTimeout(timeout => {
+      this.bombMove = setTimeout(timeout => {
         bomb.style.top = top + 'px'
         top = top - 16
         this.moveBomb(bomb, top)
-      }, 1000)
-    } else {
-      bomb.src = '../image/boom.png'
+        this.checkIfHit(bomb)
+      }, 100)
     }
   }
 
   createAliens () {
     const alien = document.createElement('evil-alien')
     const container = this.shadowRoot.querySelector('#container')
+    alien.classList.add('aliens')
     setTimeout(timeout => {
       alien.style.position = 'absolute'
       alien.style.top = 0 + 'px'
@@ -112,13 +115,13 @@ export class BattleGame extends window.HTMLElement {
       container.appendChild(alien)
       this.moveAliens(alien)
       this.createAliens()
-    }, 500)
+    }, 2000)
   }
 
   moveAliens (alien) {
     const top = parseInt(alien.style.top)
     if (top < 544) {
-      setTimeout(timeout => {
+      this.movingAlien = setTimeout(timeout => {
         alien.style.top = top + 16 + 'px'
         this.moveAliens(alien)
       }, 1000)
@@ -141,6 +144,23 @@ export class BattleGame extends window.HTMLElement {
       return true
     }
     return false
+  }
+
+  // check if the bomb and the alien are at the same positon and then remove them
+  checkIfHit (bomb) {
+    const aliens = this.shadowRoot.querySelectorAll('.aliens')
+    const bombTop = parseInt(bomb.style.top)
+    const bombLeft = parseInt(bomb.style.left)
+    aliens.forEach(alien => {
+      const alienTop = parseInt(alien.style.top)
+      const alienLeft = parseInt(alien.style.left)
+      if (Math.abs(alienTop - bombTop) < 16 && Math.abs(alienLeft - bombLeft) < 16) {
+        alien.remove()
+        bomb.remove()
+        clearTimeout(this.movingAlien)
+        clearTimeout(this.bombMove)
+      }
+    })
   }
 }
 

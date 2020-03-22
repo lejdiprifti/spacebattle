@@ -11,3 +11,7 @@ body,html {
     top: 0px;
     left: 0px;
 }
+
+.killed {
+    display: none;
+}
