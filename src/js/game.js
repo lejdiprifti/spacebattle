@@ -22,18 +22,9 @@ export class BattleGame extends window.HTMLElement {
     super()
     this.attachShadow({ mode: 'open' })
     this.shadowRoot.appendChild(template.content.cloneNode(true))
-    this.createArray()
     this.moveSpaceship()
     this.createAliens()
     this.score = 0
-  }
-
-  createArray () {
-    const columns = (window.screen.width / 64).toPrecision(2)
-    const rows = (window.screen.height / 64).toPrecision(2)
-    let gamingArray = new Array(Number(rows)).fill()
-    gamingArray = gamingArray.map(el => new Array(Number(columns)))
-    return gamingArray
   }
 
   moveSpaceship () {
@@ -115,7 +106,7 @@ export class BattleGame extends window.HTMLElement {
 
   moveAliens (alien) {
     const top = parseInt(alien.style.top)
-    if (top < 530) {
+    if (top < 523) {
       this.movingAlien = setTimeout(timeout => {
         alien.style.top = top + 16 + 'px'
         this.moveAliens(alien)
