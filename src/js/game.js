@@ -1,14 +1,19 @@
 import './spaceship.js'
 import './alien.js'
+import './endGame.js'
 const template = document.createElement('template')
 template.innerHTML = `
 <head>
 <link rel="stylesheet" href="../css/style.css" />
 </head>
 <div id="score">
-  <p></p>
+  <h1>Score</h1>
+  <p>0</p>
 </div>
-<div id="redLine">
+<div id="line">
+<div id="redLine"></div>
+<img id="satelliteLeft" src="../image/satelliteLeft.png" alt="satellite" />
+<img id="satelliteRight" src="../image/satelliteRight.png" alt="satellite" />
 </div>
 <div id="container">
 <template>
@@ -25,6 +30,9 @@ export class BattleGame extends window.HTMLElement {
     this.moveSpaceship()
     this.createAliens()
     this.score = 0
+    this.index = 0
+    this.timeoutArray = []
+    this.ended = false
   }
 
   moveSpaceship () {
@@ -60,6 +68,8 @@ export class BattleGame extends window.HTMLElement {
     document.addEventListener('keydown', event => {
       if (event.keyCode === 32) {
         this.createBomb()
+        const audio = new Audio('../image/rocketSound.mp3')
+        audio.play()
       }
     })
   }
@@ -94,6 +104,7 @@ export class BattleGame extends window.HTMLElement {
     const container = this.shadowRoot.querySelector('#container')
     this.createAlien = setTimeout(timeout => {
       const alien = document.createElement('evil-alien')
+      alien.setAttribute('index', this.index)
       alien.classList.add('aliens')
       alien.style.position = 'absolute'
       alien.style.top = 0 + 'px'
@@ -101,19 +112,19 @@ export class BattleGame extends window.HTMLElement {
       container.appendChild(alien)
       this.moveAliens(alien)
       this.createAliens()
+      this.index += 1
     }, 2000)
   }
 
   moveAliens (alien) {
     const top = parseInt(alien.style.top)
     if (top < 523) {
-      this.movingAlien = setTimeout(timeout => {
+      this.timeoutArray.push('alien' + alien.getAttribute('index') + ' ' + setTimeout(() => {
         alien.style.top = top + 16 + 'px'
         this.moveAliens(alien)
-      }, 1000)
-    } else {
-      clearTimeout(this.createAlien)
-      this.shadowRoot.innerHTML = ''
+      }, 300))
+    } else if (this.ended === false) {
+      this.endGame()
     }
   }
 
@@ -131,23 +142,47 @@ export class BattleGame extends window.HTMLElement {
     const aliens = this.shadowRoot.querySelectorAll('.aliens')
     const bombTop = parseInt(bomb.style.top)
     const bombLeft = parseInt(bomb.style.left)
+    const audio = new Audio('../image/explosion_medium.mp3')
     aliens.forEach(alien => {
       const alienTop = parseInt(alien.style.top)
       const alienLeft = parseInt(alien.style.left)
-      if (Math.abs(alienTop - bombTop) < 16 && Math.abs(alienLeft - bombLeft) < 16) {
+      if (Math.abs(alienTop - bombTop) < 18 && Math.abs(alienLeft - bombLeft) < 18) {
+        this.clearAlienMoving(alien)
+        audio.play()
         alien.remove()
         bomb.remove()
-        clearTimeout(this.movingAlien)
-        clearTimeout(this.bombMove)
         this.updateScore()
       }
     })
   }
 
+  clearAlienMoving (alien) {
+    this.timeoutArray.forEach(timeout => {
+      const splitArray = timeout.split(' ') // [alien index, timeout number]
+      if (splitArray[0] === 'alien' + alien.getAttribute('index')) {
+        clearTimeout(parseInt(splitArray[1]))
+      }
+    })
+  }
+
+  endGame () {
+    this.ended = true
+    const alienArray = this.shadowRoot.querySelectorAll('.aliens')
+    this.shadowRoot.innerHTML = ''
+    alienArray.forEach(alien => {
+      this.clearAlienMoving(alien)
+    })
+    const obj = JSON.parse(window.localStorage.getItem((window.localStorage.length - 1).toString()))
+    obj.score = this.score
+    window.localStorage.setItem((window.localStorage.length - 1).toString(), JSON.stringify(obj))
+    const endGame = document.createElement('end-game')
+    document.body.appendChild(endGame)
+  }
+
   updateScore () {
     this.score = this.score + 1
     const scoreText = this.shadowRoot.querySelector('#score p')
-    scoreText.innerHTML = this.score
+    scoreText.innerHTML = `${this.score} <img src='../image/alien.png' alt='alien' />`
   }
 }
 

@@ -1,0 +1,27 @@
+#container {
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: cartoonRegular;
+}
+
+.scoreboard {
+    text-align: center;
+    width: 30%;
+    background-color: rgb(70, 253, 146);
+    margin-bottom: 4%;
+}
+
+h1 {
+    font-family: cartoon;
+}
+
+.header {
+    margin-top: 2%;
+}
+
+button {
+    font-family: cartoonRegular;
+}

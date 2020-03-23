@@ -1,0 +1,23 @@
+#container {
+    height: 544px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: cartoonRegular;
+}
+
+.content h1 {
+    font-family: cartoon;
+}
+
+.content input {
+    margin: 2%;
+}
