@@ -36,7 +36,7 @@ export class StartGame extends window.HTMLElement {
   saveUsername () {
     const input = this.shadowRoot.querySelector('input')
     const object = {
-      username: input.value,
+      username: input.value || 'Unknown',
       score: 0
     }
     window.localStorage.setItem(this.index, JSON.stringify(object))
