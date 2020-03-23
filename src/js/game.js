@@ -5,6 +5,11 @@ template.innerHTML = `
 <head>
 <link rel="stylesheet" href="../css/style.css" />
 </head>
+<div id="score">
+  <p></p>
+</div>
+<div id="redLine">
+</div>
 <div id="container">
 <template>
 <img id="bomb" src="../image/bomb.png" alt="bomb"></img>
@@ -20,6 +25,7 @@ export class BattleGame extends window.HTMLElement {
     this.createArray()
     this.moveSpaceship()
     this.createAliens()
+    this.score = 0
   }
 
   createArray () {
@@ -35,12 +41,11 @@ export class BattleGame extends window.HTMLElement {
 
     const spaceship = document.createElement('space-ship')
     spaceship.style.position = 'absolute'
-    spaceship.style.top = 32
-    spaceship.style.left = 32
+    spaceship.style.left = 600 + 'px'
+    spaceship.classList.add('spaceship')
     container.appendChild(spaceship)
 
-    let top = 32
-    let left = 32
+    let left = 600
     document.addEventListener('keydown', () => {
       switch (event.keyCode) {
         case 39:
@@ -53,18 +58,6 @@ export class BattleGame extends window.HTMLElement {
           if (this.validatePostionLeft(left, event.keyCode) === true) {
             spaceship.style.left = (left - 16) + 'px'
             left -= 16
-          }
-          break
-        case 38:
-          if (this.validatePostionTop(top, event.keyCode) === true) {
-            spaceship.style.top = (top - 16) + 'px'
-            top -= 16
-          }
-          break
-        case 40:
-          if (this.validatePostionTop(top, event.keyCode) === true) {
-            spaceship.style.top = (top + 16) + 'px'
-            top += 16
           }
           break
       }
@@ -83,7 +76,7 @@ export class BattleGame extends window.HTMLElement {
   createBomb () {
     const container = this.shadowRoot.querySelector('#container')
     const spaceship = this.shadowRoot.querySelector('space-ship')
-    const top = parseInt(spaceship.style.top)
+    const top = 544
     let bomb = this.shadowRoot.querySelector('template').content.firstElementChild
     bomb = document.importNode(bomb, true)
     bomb.style.position = 'absolute'
@@ -101,14 +94,16 @@ export class BattleGame extends window.HTMLElement {
         this.moveBomb(bomb, top)
         this.checkIfHit(bomb)
       }, 100)
+    } else {
+      bomb.remove()
     }
   }
 
   createAliens () {
-    const alien = document.createElement('evil-alien')
     const container = this.shadowRoot.querySelector('#container')
-    alien.classList.add('aliens')
-    setTimeout(timeout => {
+    this.createAlien = setTimeout(timeout => {
+      const alien = document.createElement('evil-alien')
+      alien.classList.add('aliens')
       alien.style.position = 'absolute'
       alien.style.top = 0 + 'px'
       alien.style.left = parseInt(Math.random() * 1000) + 'px'
@@ -120,11 +115,14 @@ export class BattleGame extends window.HTMLElement {
 
   moveAliens (alien) {
     const top = parseInt(alien.style.top)
-    if (top < 544) {
+    if (top < 530) {
       this.movingAlien = setTimeout(timeout => {
         alien.style.top = top + 16 + 'px'
         this.moveAliens(alien)
       }, 1000)
+    } else {
+      clearTimeout(this.createAlien)
+      this.shadowRoot.innerHTML = ''
     }
   }
 
@@ -132,15 +130,6 @@ export class BattleGame extends window.HTMLElement {
     if (left < 1280 && code === 39) {
       return true
     } else if (left > 0 && code === 37) {
-      return true
-    }
-    return false
-  }
-
-  validatePostionTop (top, code) {
-    if (top > 0 && code === 38) {
-      return true
-    } else if (top < 544 && code === 40) {
       return true
     }
     return false
@@ -159,8 +148,15 @@ export class BattleGame extends window.HTMLElement {
         bomb.remove()
         clearTimeout(this.movingAlien)
         clearTimeout(this.bombMove)
+        this.updateScore()
       }
     })
+  }
+
+  updateScore () {
+    this.score = this.score + 1
+    const scoreText = this.shadowRoot.querySelector('#score p')
+    scoreText.innerHTML = this.score
   }
 }
 
