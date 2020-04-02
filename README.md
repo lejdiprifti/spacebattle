@@ -1,6 +1,3 @@
-## Examination assignment 2
-This is the assignment repo for the second assignment in the course. 
-
 ## Installation
 Make sure node.js and npm is installed on your system.
 
